@@ -3,7 +3,8 @@ using CS_FULLSTACK_03._12._2024.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 //!!CONFIG
-//Her henter vi inn alle konfigurasjonsobjekter, og annen data
+//Her henter vi inn alle konfigurasjonsobjekter, services,
+// og annen data
 //vår api kan ta i bruk.
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,14 +35,14 @@ if (app.Environment.IsDevelopment())
 //CREATE, her tillater vi apiet å CREATE (lage) en film
 //Via en POST request med jsondata som samsvarer med 
 //vår JsonMovieObject modell.
-app.MapPost("/movies", (JsonMovieObject newMov)=>
+app.MapPost("/movies", (JsonMovieObject newMov) =>
 {
     context.AddMovie(newMov);
     context.SaveData();
 });
 
 //READ, her åpner vi for å kunne READ (lese) etter en film, basert på ID.
-app.MapGet("/movies/{id}", Results<Ok<Movie>, NotFound>(int id)=>
+app.MapGet("/movies/{id}", Results<Ok<Movie>, NotFound> (int id) =>
 {
     var movie = context.Movies.FirstOrDefault(movie => movie.Id == id);
     if (movie == null) return TypedResults.NotFound();
@@ -51,7 +52,7 @@ app.MapGet("/movies/{id}", Results<Ok<Movie>, NotFound>(int id)=>
 
 //READ, Her åpner vi for å kunne READ (lese) alle filmer.
 //!!TODO Implementer å hente inn søkeparametere!
-app.MapGet("/movies", ()=> context.Movies);
+app.MapGet("/movies", () => context.Movies);
 
 
 //!!TODO Implementer en UPDATE (oppdater) hvor vi skal kunne oppdatere et datapunkt i Movies;
