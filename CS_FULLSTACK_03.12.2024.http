@@ -1,0 +1,6 @@
+@CS_FULLSTACK_03._12._2024_HostAddress = http://localhost:5176
+
+GET {{CS_FULLSTACK_03._12._2024_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
