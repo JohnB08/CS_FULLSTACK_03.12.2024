@@ -87,7 +87,10 @@ app.MapGet("/movies", ([AsParameters] MovieQueryParam queryParams) =>
 });
 
 
-//!!TODO Implementer en UPDATE (oppdater) hvor vi skal kunne oppdatere et datapunkt i Movies;
+//Her tar vi i mot et Helt movie object, inkludert en ID.
+//Vi velger å stole på at PUT requesten har en gyldig film
+//Og enten sletter en funnet film og putter inn erstatningen
+//Eller putter den inn som en ny film i Movies.
 app.MapPut("/movies", Results<NoContent, Created> (Movie mov) =>
 {
     var existingMovie = context.Movies.Find(movie => movie.Id == mov.Id);
@@ -103,7 +106,9 @@ app.MapPut("/movies", Results<NoContent, Created> (Movie mov) =>
     return TypedResults.NoContent();
 });
 
-//!!TODO Implementer en DELETE (slett) hvor vi skal kunne slette et datapunkt i Movies;
+//Her tar vi inn en id fra URL
+//Og prøver å slette en film med Id lik parameter id.
+//Vi returnerer enten Utført, eller Ikke funnet.
 app.MapDelete("/movies/{id}", Results<NoContent, NotFound> (int id) =>
 {
     var existingMovie = context.Movies.Find(movie => movie.Id == id);

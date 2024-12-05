@@ -3,6 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CS_FULLSTACK_03._12._2024.Models;
 
+/// <summary>
+/// Dette er en modell av våre queryparameterene
+/// Vi bruker atributten [FromQuery]
+/// For å knytte hver Property til et innkommende url query parameter. 
+/// </summary>
 public class MovieQueryParam
 {
     [FromQuery(Name = "title")]

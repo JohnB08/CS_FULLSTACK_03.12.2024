@@ -2,8 +2,14 @@ using System;
 
 namespace CS_FULLSTACK_03._12._2024.Models;
 
-public class MovieList:List<Movie>
+public class MovieList : List<Movie>
 {
+    /// <summary>
+    /// Her tar vi inn et sett med søkeparametere hentet fra URL
+    /// Og prøver å generere et søk i MovieListen basert på disse. 
+    /// </summary>
+    /// <param name="queryParams">Representererer et sett med parametere vi leter etter i URL query parameters.</param>
+    /// <returns>en IQueryable query, med alle queryene vi har så langt.</returns>
     public IQueryable<Movie> QueryBuilder(MovieQueryParam queryParams)
     {
         var query = this.AsQueryable();
