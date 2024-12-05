@@ -8,9 +8,7 @@ public class DataContext
 {
     private int IdIncrementor { get; set; } = 0;
     public MovieList Movies = [];
-    public class MovieList : List<Movie>
-    {
-    }
+    
     /// <summary>
     /// En metode som tar inn et jsonObject
     /// og legger til en ny Movie med en incremented 

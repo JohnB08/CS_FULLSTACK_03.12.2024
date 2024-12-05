@@ -1,4 +1,6 @@
 using System;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CS_FULLSTACK_03._12._2024.Models;
 
@@ -8,11 +10,17 @@ namespace CS_FULLSTACK_03._12._2024.Models;
 /// </summary>
 public class Movie
 {
+    [JsonPropertyName("id")]
     public int Id { get; set; }
+    [JsonPropertyName("title")]
     public string? Title { get; set; }
+    [JsonPropertyName("year")]
     public int Year { get; set; }
+    [JsonPropertyName("extract")]
     public string? Extract { get; set; }
+    [JsonPropertyName("cast")]
     public required List<string> Cast { get; set; }
+    [JsonPropertyName("genres")]
     public required List<string> Genres { get; set; }
 
 }

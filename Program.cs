@@ -1,6 +1,7 @@
 using CS_FULLSTACK_03._12._2024.Context;
 using CS_FULLSTACK_03._12._2024.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 //!!CONFIG
 //Her henter vi inn alle konfigurasjonsobjekter, services,
@@ -12,6 +13,29 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
+//!!CORS
+//CORS er et ekstra sikkerhetslayer på apien som skjekker om ORIGIN headeren i en respons er tillatt som ORIGIN i vår server. 
+//Som standard tillater en server kun seg selv som ORIGIN. 
+//Dette fører ofte til at hvis man prøver å gjøre requests via f.eks Javascript, vil man få en NO-CORS in header
+//Nedenfor legger vi til en CORS policy, som for nå godtar alle ORIGIN headers, og tillater at de når alle endepunktene våre.
+//!! DETTE ER IKKE DET SAMME SOM TILGANGSKONTROLL
+//Selv om vi tillater alle ORIGINS er dette ikke det samme som å åpne serveren for internett.
+//ORIGIN headeren er ikke det samme som å åpne tilgangsporter i maskinen vår, men refererer til en ORIGIN verdi i en http header 
+//(se bilde i readme for eksempel hvor vi kjørte en fetch() fra consollen i Exalidraw.com)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(
+        name: "AllowAll",
+        configurePolicy: policy =>
+        {
+            policy.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
+    );
+});
 var context = new DataContext();
 
 
@@ -20,6 +44,12 @@ var context = new DataContext();
 //bygge en definisjon av vår app, som skal aktivt kjøre og lytte etter
 //requests.
 var app = builder.Build();
+
+//!!CORS FORTS
+//Siden vi kun har konfigurert en CORS policy, må vi og fortelle at vi skal bruke den.
+//Det gjør vi via UseCors() methoden til app.
+//Grunnen for at dette er separert, er at dette tillater oss lett å ha en APP for hvis vi er i development mode, og en hvis vi er publisert. 
+app.UseCors("AllowAll");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -50,14 +80,42 @@ app.MapGet("/movies/{id}", Results<Ok<Movie>, NotFound> (int id) =>
 
 });
 
-//READ, Her åpner vi for å kunne READ (lese) alle filmer.
-//!!TODO Implementer å hente inn søkeparametere!
-app.MapGet("/movies", () => context.Movies);
+//READ, Her åpner vi for å kunne READ (lese) filmer, basert på params
+app.MapGet("/movies", ([AsParameters] MovieQueryParam queryParams) =>
+{
+    return context.Movies.QueryBuilder(queryParams).ToList();
+});
 
 
 //!!TODO Implementer en UPDATE (oppdater) hvor vi skal kunne oppdatere et datapunkt i Movies;
+app.MapPut("/movies", Results<NoContent, Created> (Movie mov) =>
+{
+    var existingMovie = context.Movies.Find(movie => movie.Id == mov.Id);
+    if (existingMovie == null)
+    {
+        context.Movies.Add(mov);
+        context.SaveData();
+        return TypedResults.Created();
+    }
+    context.Movies.Remove(existingMovie);
+    context.Movies.Add(mov);
+    context.SaveData();
+    return TypedResults.NoContent();
+});
 
 //!!TODO Implementer en DELETE (slett) hvor vi skal kunne slette et datapunkt i Movies;
+app.MapDelete("/movies/{id}", Results<NoContent, NotFound> (int id) =>
+{
+    var existingMovie = context.Movies.Find(movie => movie.Id == id);
+    if (existingMovie == null)
+    {
+        return TypedResults.NotFound();
+    }
+    context.Movies.Remove(existingMovie);
+    context.SaveData();
+    return TypedResults.NoContent();
+});
+
 app.UseHttpsRedirection();
 
 
